@@ -7,54 +7,86 @@
     android:padding="16dp"
     tools:context=".ui.activities.ClientActivity">
 
-    <!-- Campo de entrada para la Dirección IP -->
-
-    <!-- Campo de entrada para el Puerto -->
-
-    <!-- Botón para conectar -->
-
+    <!-- Título de la pantalla -->
     <TextView
         android:id="@+id/tvClientTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:text="Modo Cliente"
         android:textSize="28sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.036"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Etiqueta para el nombre del jugador -->
+    <TextView
+        android:id="@+id/tvNombreLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tu nombre de jugador:"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@id/etNombreCliente"
+        app:layout_constraintBottom_toTopOf="@id/etNombreCliente"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- NUEVO: Campo de texto para el nombre del cliente -->
+    <EditText
+        android:id="@+id/etNombreCliente"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="80dp"
+        android:hint="Introduce tu nombre"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvClientTitle"
+        tools:text="Cliente" />
+
+    <!-- Etiqueta para la IP -->
+    <TextView
+        android:id="@+id/tvIpLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IP del servidor:"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@id/etIpAddress"
+        app:layout_constraintBottom_toTopOf="@id/etIpAddress"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Campo de texto para la dirección IP -->
     <EditText
         android:id="@+id/etIpAddress"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="32dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="24dp"
         android:digits="0123456789."
         android:hint="Dirección IP del Servidor"
         android:inputType="phone"
         android:maxLines="1"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvClientTitle"
-        app:layout_constraintVertical_bias="0.374" />
+        app:layout_constraintTop_toBottomOf="@id/etNombreCliente" />
 
+    <!-- Botón para conectar -->
     <Button
         android:id="@+id/btnConnect"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        android:padding="12dp"
         android:text="Conectar"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.583" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

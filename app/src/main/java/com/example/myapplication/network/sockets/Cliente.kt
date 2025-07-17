@@ -10,7 +10,7 @@ import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.net.Socket
 
-class Cliente(dir: String, private val turno: Int) : Runnable {
+class Cliente(dir: String, private val turno: Int, var nombre: String) : Runnable {
   private var direccionIP = dir
   private var socket: Socket? = null
   private var dis: BufferedReader? = null
@@ -58,9 +58,10 @@ class Cliente(dir: String, private val turno: Int) : Runnable {
           val ultimoTurno: Int = partes[5].toInt()
           val casillas: Int = partes[6].toInt()
           val banderas: Int = partes[7].toInt()
+          val nombre: String = partes[8]
 
           // Notifica a GameActivity, ¡ahora con el turno!
-          moveListener?.onMoveReceived(turnoJugador, action, row, col, puntuacion, ultimoTurno, casillas, banderas)
+          moveListener?.onMoveReceived(turnoJugador, action, row, col, puntuacion, ultimoTurno, casillas, banderas,nombre)
         } catch (e: Exception) {
           println("Error al interpretar mensaje MOVE: $msj")
           e.printStackTrace()
@@ -82,6 +83,7 @@ class Cliente(dir: String, private val turno: Int) : Runnable {
       val filas = configBasica[0].toInt()
       val columnas = configBasica[1].toInt()
       val minas = configBasica[2].toInt()
+      val nombre: String = configBasica[3]
 
       val posicionesStr = partes[1] // "0-1_2-3_..."
       val listaPosiciones =
@@ -91,7 +93,7 @@ class Cliente(dir: String, private val turno: Int) : Runnable {
           }
 
       // Creamos el objeto de configuración con la lista de minas
-      ConfiguracionTablero(filas, columnas, minas, listaPosiciones)
+      ConfiguracionTablero(filas, columnas, minas, listaPosiciones, nombre)
     } catch (e: Exception) {
       e.printStackTrace()
       null

@@ -19,11 +19,14 @@ import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.gridlayout.widget.GridLayout
+import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.R
 import com.example.myapplication.game.core.Casilla
 import com.example.myapplication.game.core.Jugador
 import com.example.myapplication.game.core.Tablero
 import com.example.myapplication.network.sockets.GameEventsListener
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class GameActivity : AppCompatActivity(), GameEventsListener {
   private var gameConfig: ConfiguracionTablero? = null
@@ -47,6 +50,7 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
 
   private var puntuacionOponente: Int = 0
   private var banderasOponente: Int = 0
+  private var nombreOponente: String = ""
 
   private val cliente = MainActivity.Sockets.clienteU
 
@@ -120,7 +124,7 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
             config.filas,
             config.columnas,
             config.posicionesMinas!!,
-            "Jugador ${cliente?.getTurno()}",
+            cliente?.nombre ?: "Player",
             miTurno)
     juegoActivo = true
 
@@ -208,8 +212,9 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
       val puntuacion: Int = tableroLogico.getJugador().puntuacion
       val casillas: Int = tableroLogico.getJugador().casillasAbiertas
       val banderas: Int = tableroLogico.getJugador().banderasCorrectas
+      val nombre: String = tableroLogico.getJugador().nombre
 
-      val mensajeMovimiento = "MOVE $miTurno $action ${rowStr}_${colStr} $puntuacion $turnoActual $casillas $banderas"
+      val mensajeMovimiento = "MOVE $miTurno $action ${rowStr}_${colStr} $puntuacion $turnoActual $casillas $banderas $nombre"
 
 
       // 4. Envía la jugada al servidor (que la reenviará a todos)
@@ -225,7 +230,8 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
       puntuacion: Int,
       ultimoTurno: Int,
       casillas: Int,
-      banderas: Int
+      banderas: Int,
+      nombre: String
   ) {
     if(turno == miTurno){
       return
@@ -255,6 +261,7 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
       if (turno != miTurno) {
         puntuacionOponente = puntuacion
         banderasOponente = banderas
+        nombreOponente = nombre
       }
 
       turnoActual = if (turno == 1) 2 else 1
@@ -362,33 +369,38 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
       juegoActivo = false
       sendMoveButton.isEnabled = false // Desactivar botón si lo tienes
 
-      // Asumimos que getJugador().toString() devuelve "Nombre;Puntuacion"
-      // Creamos el string combinado: "Nombre;Puntuacion;resultado"
       val puntuacion: Int = tableroLogico.getJugador().puntuacion
       val banderas: Int = tableroLogico.getJugador().banderasCorrectas
 
-      val datosJuego: String =
+      Toast.makeText(this, "¡Juego Terminado! Cargando resultados...", Toast.LENGTH_SHORT).show()
+
+      // --- INICIO DEL DELAY USANDO COROUTINES ---
+      lifecycleScope.launch {
+        delay(2000) // Espera 2000 milisegundos (2 segundos)
+
+        // Este código se ejecuta DESPUÉS de los 2 segundos
+
+        // (El resto de tu código para preparar el Intent)
+        val puntuacion: Int = tableroLogico.getJugador().puntuacion
+        val banderas: Int = tableroLogico.getJugador().banderasCorrectas
+        val datosJuego: String =
           tableroLogico.getJugador().nombre +
-              ";$puntuacion" +
-              ";$resultado" +
-              ";$puntuacionOponente" +
-              ";$miTurno" +
-              ";$ultimoTurno"+
+                  ";$puntuacion" +
+                  ";$resultado" +
+                  ";$puntuacionOponente" +
+                  ";$miTurno" +
+                  ";$ultimoTurno"+
                   ";$banderas"+
-                  ";$banderasOponente"
+                  ";$banderasOponente"+ ";$nombreOponente"
 
-      // Creamos el Intent para iniciar EndActivity
-      val intent = Intent(this, EndActivity::class.java)
+        // Creamos el Intent para iniciar EndActivity
+        val intent = Intent(this@GameActivity, EndActivity::class.java)
+        intent.putExtra(EndActivity.EXTRA_DATOS_JUEGO, datosJuego)
 
-      // Añadimos el string combinado como un extra.
-      // Usaremos una clave constante para evitar errores.
-      intent.putExtra(EndActivity.EXTRA_DATOS_JUEGO, datosJuego)
-
-      // Iniciamos la nueva activity
-      startActivity(intent)
-
-      // Cerramos la activity del juego
-      finish()
+        // Iniciamos la nueva activity y cerramos la actual
+        startActivity(intent)
+        finish()
+      }
     }
   }
 

@@ -11,6 +11,7 @@ interface GameEventsListener {
       puntuacion: Int,
       ultimoTurno: Int,
       casillas: Int,
-      banderas: Int
+      banderas: Int,
+      nombre: String
   )
 }

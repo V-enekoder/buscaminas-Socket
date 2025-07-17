@@ -15,7 +15,8 @@ data class ConfiguracionTablero(
     val filas: Int,
     val columnas: Int,
     val minas: Int,
-    val posicionesMinas: List<Pair<Int, Int>>? = null
+    val posicionesMinas: List<Pair<Int, Int>>? = null,
+    val nombre: String
 ) : Serializable
 
 class GameConfigurationActivity : AppCompatActivity() {
@@ -26,12 +27,15 @@ class GameConfigurationActivity : AppCompatActivity() {
   private lateinit var etColumns: EditText
   private lateinit var etMines: EditText
   private lateinit var btnStartGame: Button
+  private lateinit var nombreServidor: String
   val server = MainActivity.Sockets.serverU
   val cliente = MainActivity.Sockets.clienteU
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_game_configuration)
+
+    nombreServidor = intent.getStringExtra("NOMBRE_JUGADOR_SERVIDOR") ?: "Servidor"
 
     // Inicializar vistas
     rgDifficulty = findViewById(R.id.rgDifficulty)
@@ -63,9 +67,9 @@ class GameConfigurationActivity : AppCompatActivity() {
 
     val config: ConfiguracionTablero? =
         when (selectedId) {
-          R.id.rbEasy -> ConfiguracionTablero(4, 4, 4)
-          R.id.rbMedium -> ConfiguracionTablero(6, 6, 10)
-          R.id.rbHard -> ConfiguracionTablero(8, 8, 12)
+          R.id.rbEasy -> ConfiguracionTablero(4, 4, 4, nombre = nombreServidor)
+          R.id.rbMedium -> ConfiguracionTablero(6, 6, 10, nombre = nombreServidor)
+          R.id.rbHard -> ConfiguracionTablero(8, 8, 12, nombre = nombreServidor)
           R.id.rbCustom -> getCustomConfiguration()
           else -> null
         }
@@ -76,7 +80,7 @@ class GameConfigurationActivity : AppCompatActivity() {
       val mensaje = config.toMessage(posicionesMinas)
       Toast.makeText(
               this,
-              "Iniciando partida: ${config.filas}x${config.columnas}, ${config.minas} minas",
+              "Iniciando partida para ${config.nombre}",
               Toast.LENGTH_LONG)
           .show()
       cliente?.setContext(this)
@@ -117,7 +121,7 @@ class GameConfigurationActivity : AppCompatActivity() {
 
     // El nuevo formato del mensaje es:
     // GAME_CONFIG filas_columnas_minas POSICIONES
-    return "GAME_CONFIG ${filas}_${columnas}_${minas} $posicionesStr"
+    return "GAME_CONFIG ${filas}_${columnas}_${minas}_${nombre} $posicionesStr"
   }
 
   private fun getCustomConfiguration(): ConfiguracionTablero? {
@@ -154,6 +158,6 @@ class GameConfigurationActivity : AppCompatActivity() {
       return null
     }
 
-    return ConfiguracionTablero(rows, cols, mines)
+    return ConfiguracionTablero(rows, cols, mines, nombre = nombreServidor)
   }
 }

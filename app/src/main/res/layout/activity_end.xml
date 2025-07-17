@@ -73,10 +73,10 @@
         <!-- Fila con TUS datos -->
         <TableRow>
             <TextView
+                android:id="@+id/miNombreTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="Tú"
                 android:textStyle="bold" />
 
             <TextView
@@ -99,10 +99,10 @@
         <!-- Fila con los datos del OPONENTE -->
         <TableRow>
             <TextView
+                android:id="@+id/NombreOponenteTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="Oponente"
                 android:textStyle="bold" />
 
             <TextView

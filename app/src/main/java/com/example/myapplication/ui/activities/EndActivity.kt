@@ -22,11 +22,12 @@ class EndActivity : AppCompatActivity() {
     // 1. Enlazar los componentes del layout
     val tituloResultadoTextView: TextView = findViewById(R.id.tituloResultadoTextView)
     val mensajeDetalladoTextView: TextView = findViewById(R.id.mensajeDetalladoTextView)
-    val jugarDeNuevoButton: Button = findViewById(R.id.jugarDeNuevoButton)
 
     // Nuevos TextViews para la tabla
+    val miNombreTextView: TextView = findViewById(R.id.miNombreTextView)
     val miPuntuacionTextView: TextView = findViewById(R.id.miPuntuacionTextView)
     val misBanderasTextView: TextView = findViewById(R.id.misBanderasTextView)
+    val nombreOponenteTextView: TextView = findViewById(R.id.NombreOponenteTextView)
     val oponentePuntuacionTextView: TextView = findViewById(R.id.oponentePuntuacionTextView)
     val oponenteBanderasTextView: TextView = findViewById(R.id.oponenteBanderasTextView)
     val statsTableLayout: TableLayout = findViewById(R.id.statsTableLayout) // Para ocultarla en caso de error
@@ -38,7 +39,7 @@ class EndActivity : AppCompatActivity() {
     if (datosJuego != null) {
       val partes = datosJuego.split(';')
 
-      if (partes.size == 8) {
+      if (partes.size == 9) {
         // Hacemos visible la tabla por si estaba oculta
         statsTableLayout.visibility = View.VISIBLE
 
@@ -51,6 +52,7 @@ class EndActivity : AppCompatActivity() {
         val ultimoTurno: Int = partes[5].toInt()
         val banderas: Int = partes[6].toInt()
         val banderasOponente: Int = partes[7].toInt()
+        val nombreOponente: String = partes[8]
 
         // 4. Determinar los mensajes basados en el código (esta lógica no cambia)
         val titulo: String
@@ -101,6 +103,8 @@ class EndActivity : AppCompatActivity() {
         mensajeDetalladoTextView.text = mensajeDetallado
 
         // Rellenar la tabla con los datos
+        miNombreTextView.text = nombre
+        nombreOponenteTextView.text = nombreOponente
         miPuntuacionTextView.text = puntuacion.toString()
         misBanderasTextView.text = banderas.toString()
         oponentePuntuacionTextView.text = puntuacionOponente.toString()

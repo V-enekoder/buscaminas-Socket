@@ -7,6 +7,7 @@
     android:padding="16dp"
     tools:context=".ui.activities.ServerActivity">
 
+    <!-- Título principal de la pantalla -->
     <TextView
         android:id="@+id/tvServerTitle"
         android:layout_width="wrap_content"
@@ -17,34 +18,73 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/tvIpLabel"
-        app:layout_constraintVertical_chainStyle="packed" />
+        android:layout_marginTop="32dp" />
 
+    <!-- Etiqueta para el campo de nombre -->
+    <TextView
+        android:id="@+id/tvNombreLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tu nombre de jugador:"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="@id/etNombreServidor"
+        app:layout_constraintBottom_toTopOf="@id/etNombreServidor"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- NUEVO: Campo de texto para que el usuario escriba su nombre -->
+    <EditText
+        android:id="@+id/etNombreServidor"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="80dp"
+        android:hint="Introduce tu nombre"
+        android:inputType="textPersonName"
+        android:text="Servidor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvServerTitle"
+        tools:text="Servidor" />
+
+    <!-- Sección de información de la IP (sin cambios) -->
     <TextView
         android:id="@+id/tvIpLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Escuchando en la IP:"
+        android:layout_marginTop="40dp"
+        android:text="Esperando jugadores en la IP:"
         android:textSize="18sp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintTop_toBottomOf="@id/tvServerTitle"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/tvIpAddress" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/etNombreServidor" />
 
-    <!-- TextView donde mostraremos la IP -->
     <TextView
         android:id="@+id/tvIpAddress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:textColor="@color/design_default_color_primary"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:textColor="@color/design_default_color_primary"
-        tools:text="192.168.1.100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvIpLabel"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        tools:text="192.168.1.100" />
+
+    <!-- NUEVO: Botón para configurar la partida -->
+    <Button
+        android:id="@+id/btnConfigurarPartida"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        android:padding="12dp"
+        android:text="Configurar Partida"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
