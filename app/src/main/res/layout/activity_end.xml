@@ -2,24 +2,25 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".ui.activities.EndActivity">
 
+    <!-- Título principal del resultado (Ganaste/Perdiste) -->
     <TextView
         android:id="@+id/tituloResultadoTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:textSize="34sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/mensajeDetalladoTextView"
-        app:layout_constraintVertical_chainStyle="packed"
         tools:text="¡Ganaste!" />
 
+    <!-- Mensaje detallado sobre cómo terminó el juego -->
     <TextView
         android:id="@+id/mensajeDetalladoTextView"
         android:layout_width="0dp"
@@ -30,30 +31,108 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tituloResultadoTextView"
-        app:layout_constraintBottom_toTopOf="@id/datosJugadorTextView"
-        tools:text="Abriste todas las casillas libres" />
+        tools:text="El oponente explotó una mina" />
 
-    <TextView
-        android:id="@+id/datosJugadorTextView"
-        android:layout_width="wrap_content"
+    <!-- Tabla para mostrar las estadísticas del juego -->
+    <TableLayout
+        android:id="@+id/statsTableLayout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:textSize="16sp"
+        android:layout_marginTop="40dp"
+        android:stretchColumns="1,2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/mensajeDetalladoTextView"
-        app:layout_constraintBottom_toTopOf="@id/jugarDeNuevoButton"
-        tools:text="Jugador: ProPlayer - Puntuación: 1500" />
+        app:layout_constraintTop_toBottomOf="@+id/mensajeDetalladoTextView">
 
+        <!-- Fila de Cabeceras -->
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Jugador"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="Puntuación"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="Banderas"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <!-- Fila con TUS datos -->
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Tú"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/miPuntuacionTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                tools:text="1500" />
+
+            <TextView
+                android:id="@+id/misBanderasTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                tools:text="5" />
+        </TableRow>
+
+        <!-- Fila con los datos del OPONENTE -->
+        <TableRow>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Oponente"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/oponentePuntuacionTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                tools:text="1200" />
+
+            <TextView
+                android:id="@+id/oponenteBanderasTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="8dp"
+                tools:text="3" />
+        </TableRow>
+
+    </TableLayout>
+
+    <!-- Botón para volver a jugar -->
     <Button
         android:id="@+id/jugarDeNuevoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginBottom="32dp"
         android:text="Jugar de Nuevo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/datosJugadorTextView" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

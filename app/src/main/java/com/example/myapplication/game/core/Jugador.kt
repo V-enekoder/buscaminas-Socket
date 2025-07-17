@@ -8,6 +8,9 @@ class Jugador(nombreInicial: String) : Serializable {
   var puntuacion: Int = 0
     private set
 
+  var casillasAbiertas: Int = 0
+  var banderasCorrectas: Int = 0
+
   constructor(nombreInicial: String, puntuacionInicial: Int) : this(nombreInicial) {
     if (puntuacionInicial >= 0) {
       this.puntuacion = puntuacionInicial
@@ -25,13 +28,19 @@ class Jugador(nombreInicial: String) : Serializable {
     this.puntuacion--
   }
 
-  fun setPuntuacion(nuevaPuntuacion: Int) {
-    if (nuevaPuntuacion >= 0) {
-      this.puntuacion = nuevaPuntuacion
-    } else {
-      println("La puntuación no puede ser negativa. No se ha modificado.")
-    }
+  fun aumentarCasillasAbiertas(){
+    this.casillasAbiertas++
   }
+
+  fun aumentarBanderasPuestas(){
+    this.banderasCorrectas++
+  }
+
+  fun reducirBanderasPuestas(){
+    this.banderasCorrectas--
+  }
+
+
 
   override fun toString(): String {
     return "$nombre;$puntuacion)"

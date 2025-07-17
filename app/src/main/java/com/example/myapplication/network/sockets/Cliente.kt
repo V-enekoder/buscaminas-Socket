@@ -56,28 +56,13 @@ class Cliente(dir: String, private val turno: Int) : Runnable {
           val col = coords[1].toInt()
           val puntuacion: Int = partes[4].toInt()
           val ultimoTurno: Int = partes[5].toInt()
+          val casillas: Int = partes[6].toInt()
+          val banderas: Int = partes[7].toInt()
 
           // Notifica a GameActivity, ¡ahora con el turno!
-          moveListener?.onMoveReceived(turnoJugador, action, row, col, puntuacion, ultimoTurno)
+          moveListener?.onMoveReceived(turnoJugador, action, row, col, puntuacion, ultimoTurno, casillas, banderas)
         } catch (e: Exception) {
           println("Error al interpretar mensaje MOVE: $msj")
-          e.printStackTrace()
-        }
-      }
-      "SHOW_END_SCREEN" -> {
-        try {
-          moveListener?.showDebugToast("Interpretando SHOW_END_SCREEN...")
-          // Formato: SHOW_END_SCREEN nombre1_puntuacion1 nombre2_puntuacion2
-          val datosJ1 = partes[1].split("_")
-          val datosJ2 = partes[2].split("_")
-
-          val jugador1 = Jugador(nombreInicial = datosJ1[0], puntuacionInicial = datosJ1[1].toInt())
-          val jugador2 = Jugador(nombreInicial = datosJ2[0], puntuacionInicial = datosJ2[1].toInt())
-
-          // Notificamos a la activity para que muestre la pantalla final
-          moveListener?.onGameEnd(jugador1, jugador2)
-        } catch (e: Exception) {
-          println("Error al interpretar mensaje SHOW_END_SCREEN: $msj")
           e.printStackTrace()
         }
       }

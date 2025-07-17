@@ -46,6 +46,7 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
   private var miTurno = -1
 
   private var puntuacionOponente: Int = 0
+  private var banderasOponente: Int = 0
 
   private val cliente = MainActivity.Sockets.clienteU
 
@@ -202,34 +203,41 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
           }
       val miTurno = cliente?.getTurno() ?: -1 // Obtenemos el turno del cliente
       val puntuacion: Int = tableroLogico.getJugador().puntuacion
-      val ultimoTurno: Int = turnoActual
+      val casillas: Int = tableroLogico.getJugador().casillasAbiertas
+      val banderas: Int = tableroLogico.getJugador().banderasCorrectas
 
-      val mensajeMovimiento = "MOVE $miTurno $action ${rowStr}_${colStr} $puntuacion $turnoActual"
+      val mensajeMovimiento = "MOVE $miTurno $action ${rowStr}_${colStr} $puntuacion $turnoActual $casillas $banderas"
 
+      realizarJugada(action,rowStr.toInt(),colStr.toInt(),turnoActual)
       // 4. Envía la jugada al servidor (que la reenviará a todos)
       Thread { cliente?.enviarMensaje(mensajeMovimiento) }.start()
     }
   }
 
   override fun onMoveReceived(
-      turnoJugador: Int,
+      turno: Int,
       action: String,
       row: Int,
       col: Int,
       puntuacion: Int,
-      ultimoTurno: Int
+      ultimoTurno: Int,
+      casillas: Int,
+      banderas: Int
   ) {
+    if(turno == miTurno){
+      return
+    }
     runOnUiThread {
       if (!juegoActivo) return@runOnUiThread // No procesar si el juego ya terminó
 
       // --- Le dice al MODELO LOCAL qué hacer ---
       val resultadoJugada: Int =
           when (action) {
-            "REVEAL" -> tableroLogico.abrirCasilla(row, col, turnoJugador)
-            "FLAG" -> tableroLogico.marcarCasilla(row, col, turnoJugador)
+            "REVEAL" -> tableroLogico.abrirCasilla(row, col, turno)
+            "FLAG" -> tableroLogico.marcarCasilla(row, col, turno)
             "UNFLAG" ->
                 tableroLogico.desmarcarCasilla(
-                    row, col, turnoJugador) // No esta quitando la bandera
+                    row, col, turno) // No esta quitando la bandera
             else -> 0
           }
 
@@ -241,11 +249,12 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
         revelarTableroCompleto()
       }
 
-      if (turnoJugador != miTurno) {
+      if (turno != miTurno) {
         puntuacionOponente = puntuacion
+        banderasOponente = banderas
       }
 
-      turnoActual = if (turnoJugador == 1) 2 else 1
+      turnoActual = if (turno == 1) 2 else 1
 
       // 2. Actualizamos el estado del botón basándonos en el nuevo turno.
       actualizarEstadoBoton()
@@ -255,31 +264,43 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
     }
   }
 
-  override fun onGameEnd(jugador1: Jugador, jugador2: Jugador) {
+  fun realizarJugada(
+    action: String,
+    row: Int,
+    col: Int,
+    ultimoTurno: Int
+  ) {
     runOnUiThread {
-      if (!isFinishing) { // Evitar errores si la activity ya se está cerrando
-        val intent = Intent(this, EndActivity::class.java)
+      if (!juegoActivo) return@runOnUiThread // No procesar si el juego ya terminó
 
-        // Identificamos cuál es nuestro jugador y cuál el oponente
-        val miJugador: Jugador
-        val oponente: Jugador
-        if (jugador1.nombre == tableroLogico.getJugador().nombre) { // Comparamos por nombre
-          miJugador = jugador1
-          oponente = jugador2
-        } else {
-          miJugador = jugador2
-          oponente = jugador1
+      // --- Le dice al MODELO LOCAL qué hacer ---
+      val resultadoJugada: Int =
+        when (action) {
+          "REVEAL" -> tableroLogico.abrirCasilla(row, col, miTurno)
+          "FLAG" -> tableroLogico.marcarCasilla(row, col, miTurno)
+          "UNFLAG" ->
+            tableroLogico.desmarcarCasilla(
+              row, col, miTurno) // No esta quitando la bandera
+          else -> 0
         }
 
-        intent.putExtra("MI_JUGADOR", miJugador)
-        intent.putExtra("OPONENTE", oponente)
+      // --- Pide a la VISTA que se actualice con los cambios del modelo local ---
+      actualizarVistaTablero()
 
-        startActivity(intent)
-        finish() // Cerramos la GameActivity
+      if (resultadoJugada == -1) {
+        juegoActivo = false
+        revelarTableroCompleto()
       }
+
+      turnoActual = if (miTurno == 1) 2 else 1
+
+      // 2. Actualizamos el estado del botón basándonos en el nuevo turno.
+      actualizarEstadoBoton()
+
+      // --- Comprueba el estado del juego después de la jugada ---
+      verificarEstadoDelJuego(ultimoTurno)
     }
   }
-
   private fun actualizarEstadoBoton() {
     // La condición es simple: ¿El turno actual es mi turno?
     if (turnoActual == miTurno) {
@@ -341,6 +362,7 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
       // Asumimos que getJugador().toString() devuelve "Nombre;Puntuacion"
       // Creamos el string combinado: "Nombre;Puntuacion;resultado"
       val puntuacion: Int = tableroLogico.getJugador().puntuacion
+      val banderas: Int = tableroLogico.getJugador().banderasCorrectas
 
       val datosJuego: String =
           tableroLogico.getJugador().nombre +
@@ -348,7 +370,9 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
               ";$resultado" +
               ";$puntuacionOponente" +
               ";$miTurno" +
-              ";$ultimoTurno"
+              ";$ultimoTurno"+
+                  ";$banderas"+
+                  ";$banderasOponente"
 
       // Creamos el Intent para iniciar EndActivity
       val intent = Intent(this, EndActivity::class.java)
@@ -382,9 +406,5 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
       }
     }
     actualizarVistaTablero() // Vuelve a dibujar el tablero con todo revelado
-  }
-
-  override fun showDebugToast(message: String) {
-    mostrarToast(message) // Reutilizamos tu función existente
   }
 }

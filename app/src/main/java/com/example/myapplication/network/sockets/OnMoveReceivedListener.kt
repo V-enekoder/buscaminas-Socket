@@ -9,10 +9,8 @@ interface GameEventsListener {
       row: Int,
       col: Int,
       puntuacion: Int,
-      ultimoTurno: Int
+      ultimoTurno: Int,
+      casillas: Int,
+      banderas: Int
   )
-
-  fun onGameEnd(jugador1: Jugador, jugador2: Jugador)
-
-  fun showDebugToast(message: String)
 }

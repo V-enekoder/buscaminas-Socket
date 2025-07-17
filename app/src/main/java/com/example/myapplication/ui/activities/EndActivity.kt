@@ -2,14 +2,15 @@ package com.example.myapplication.ui.activities
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.R
+import android.widget.TableLayout
 
 class EndActivity : AppCompatActivity() {
 
-  // (Buena práctica) Definir la clave del extra en un companion object
   companion object {
     const val EXTRA_DATOS_JUEGO = "DATOS_JUEGO_COMPLETO"
   }
@@ -21,27 +22,37 @@ class EndActivity : AppCompatActivity() {
     // 1. Enlazar los componentes del layout
     val tituloResultadoTextView: TextView = findViewById(R.id.tituloResultadoTextView)
     val mensajeDetalladoTextView: TextView = findViewById(R.id.mensajeDetalladoTextView)
-    val datosJugadorTextView: TextView = findViewById(R.id.datosJugadorTextView)
     val jugarDeNuevoButton: Button = findViewById(R.id.jugarDeNuevoButton)
+
+    // Nuevos TextViews para la tabla
+    val miPuntuacionTextView: TextView = findViewById(R.id.miPuntuacionTextView)
+    val misBanderasTextView: TextView = findViewById(R.id.misBanderasTextView)
+    val oponentePuntuacionTextView: TextView = findViewById(R.id.oponentePuntuacionTextView)
+    val oponenteBanderasTextView: TextView = findViewById(R.id.oponenteBanderasTextView)
+    val statsTableLayout: TableLayout = findViewById(R.id.statsTableLayout) // Para ocultarla en caso de error
 
     // 2. Recibir el string combinado del Intent
     val datosJuego = intent.getStringExtra(EXTRA_DATOS_JUEGO)
 
-    // 3. Procesar los datos (¡la parte clave!)
+    // 3. Procesar los datos
     if (datosJuego != null) {
-      // Partimos el string por el separador ";"
-      // "Nombre;Puntuacion;resultado" -> ["Nombre", "Puntuacion", "resultado"]
       val partes = datosJuego.split(';')
 
-      // Verificación de seguridad para evitar crashes si el string no tiene el formato esperado
-      if (partes.size == 6) {
-        val nombre = partes[0]
+      if (partes.size == 8) {
+        // Hacemos visible la tabla por si estaba oculta
+        statsTableLayout.visibility = View.VISIBLE
+
+        // El nombre no se usa en la tabla, pero lo mantenemos por si lo necesitas en el futuro
+        val nombre: String = partes[0]
         val puntuacion: Int = partes[1].toInt()
-        val codigoResultado = partes[2].toIntOrNull() // Usamos toIntOrNull() para más seguridad
+        val codigoResultado: Int? = partes[2].toIntOrNull()
         val puntuacionOponente: Int = partes[3].toInt()
         val miTurno: Int = partes[4].toInt()
         val ultimoTurno: Int = partes[5].toInt()
-        // 4. Determinar los mensajes basados en el código
+        val banderas: Int = partes[6].toInt()
+        val banderasOponente: Int = partes[7].toInt()
+
+        // 4. Determinar los mensajes basados en el código (esta lógica no cambia)
         val titulo: String
         val mensajeDetallado: String
 
@@ -58,21 +69,23 @@ class EndActivity : AppCompatActivity() {
           1 -> {
             titulo = "¡Juego terminado!"
             if (puntuacion > puntuacionOponente) {
-              mensajeDetallado = "Has Ganado"
+              mensajeDetallado = "¡Has ganado!"
             } else if (puntuacionOponente > puntuacion) {
               mensajeDetallado = "Has perdido"
             } else {
-              mensajeDetallado = "Empate"
+              mensajeDetallado = if (banderas > banderasOponente) {
+                "¡Has ganado por banderas!"
+              } else {
+                "Has perdido por banderas"
+              }
             }
-
-            // mensajeDetallado = "Se marcaron todas las minas"
           }
           2 -> {
             titulo = "¡Juego Terminado!"
             if (puntuacion > puntuacionOponente) {
-              mensajeDetallado = "Has Ganado"
+              mensajeDetallado = "¡Has ganado por tiempo!"
             } else if (puntuacionOponente > puntuacion) {
-              mensajeDetallado = "Has perdido"
+              mensajeDetallado = "Has perdido por tiempo"
             } else {
               mensajeDetallado = "Empate"
             }
@@ -86,24 +99,26 @@ class EndActivity : AppCompatActivity() {
         // 5. Actualizar la UI con los datos procesados
         tituloResultadoTextView.text = titulo
         mensajeDetalladoTextView.text = mensajeDetallado
-        datosJugadorTextView.text =
-            "Jugador: $nombre - Puntuación: $puntuacion - Adversario: $puntuacionOponente"
+
+        // Rellenar la tabla con los datos
+        miPuntuacionTextView.text = puntuacion.toString()
+        misBanderasTextView.text = banderas.toString()
+        oponentePuntuacionTextView.text = puntuacionOponente.toString()
+        oponenteBanderasTextView.text = banderasOponente.toString()
+
       } else {
-        // Si el formato es incorrecto, mostramos un error genérico
+        // Si el formato es incorrecto, mostramos un error genérico y ocultamos la tabla
         tituloResultadoTextView.text = "Error"
         mensajeDetalladoTextView.text = "No se pudieron cargar los datos del resultado."
+        statsTableLayout.visibility = View.GONE // Ocultamos la tabla para que no se vea vacía
         Log.e("EndActivity", "Formato de datos de juego incorrecto: $datosJuego")
       }
+    } else {
+      // Caso extra: si el intent no trae datos
+      tituloResultadoTextView.text = "Error"
+      mensajeDetalladoTextView.text = "No se recibieron datos del juego."
+      statsTableLayout.visibility = View.GONE
+      Log.e("EndActivity", "El extra DATOS_JUEGO_COMPLETO es nulo.")
     }
-
-    // 6. Configurar el botón para jugar de nuevo
-    /*jugarDeNuevoButton.setOnClickListener {
-      // Regresa a la pantalla del juego
-      val intentJuego =
-          Intent(
-              this, GameActivity::class.java) // Asegúrate que GameActivity sea el nombre correcto
-      startActivity(intentJuego)
-      finish() // Cierra esta pantalla
-    }*/
   }
 }
