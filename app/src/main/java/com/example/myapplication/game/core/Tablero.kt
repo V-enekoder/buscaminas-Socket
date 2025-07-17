@@ -3,7 +3,6 @@ package com.example.myapplication.game.core
 class Tablero(
     private val filas: Int,
     private val columnas: Int,
-    // private val numeroMinas: Int,
     private val posicionesMinas: List<Pair<Int, Int>>,
     private val nombre: String,
     private val turno: Int
@@ -82,6 +81,7 @@ class Tablero(
     val aumentarPuntuacion: Boolean = !casilla.isMina() && turnoJugada == turno
     if (aumentarPuntuacion) {
       jugador.aumentarPuntuacion()
+      jugador.aumentarCasillasAbiertas()
     }
     if (casilla.isMina()) {
       juegoTerminado = true
@@ -104,6 +104,7 @@ class Tablero(
           adyacente.abrir()
           if (aumentarPuntuacion) {
             jugador.aumentarPuntuacion()
+            jugador.aumentarCasillasAbiertas()
           }
 
           if (adyacente.getMinasAlrededor() == 0) {
@@ -140,6 +141,7 @@ class Tablero(
 
     if (casilla.isMina() && turnoJugada == turno) {
       jugador.aumentarPuntuacion()
+      jugador.aumentarBanderasPuestas()
     }
 
     return 1
@@ -153,36 +155,10 @@ class Tablero(
 
     if (casilla.isMina() && turnoJugada == turno) {
       jugador.reducirPuntuacion()
+      jugador.reducirBanderasPuestas()
     }
 
     return 1
-  }
-
-  private fun seguir_partida(): Boolean {
-    for (r in 0 until filas) {
-      for (c in 0 until columnas) {
-        val casilla = tablero[r][c]
-        if (!casilla.isMina() && !casilla.isAbierta()) {
-          return false
-        }
-        if (casilla.isMina() && !casilla.isMarcada()) {
-          return false
-        }
-      }
-    }
-    return true
-  }
-
-  fun getFilas(): Int = filas
-
-  fun getColumnas(): Int = columnas
-
-  fun getMinas(): Int = numeroMinas
-
-  fun getJugadas(): Int = jugadas
-
-  fun getTablero(): Array<Array<Casilla>> {
-    return tablero
   }
 
   fun getJugador(): Jugador {
@@ -201,51 +177,6 @@ class Tablero(
     }
     return null
   }
-
-  /*fun seguirPartida(): Boolean {
-    var casillasAbiertas = 0
-    var minasMarcadasCorrectamente = 0
-
-    for (r in 0 until filas) {
-      for (c in 0 until columnas) {
-        val casilla = tablero[r][c]
-
-        if (casilla.isAbierta() && casilla.isMina()) {
-          return false // La partida no debe continuar (0 en C++)
-        }
-
-        // Contar casillas abiertas (que no sean la mina explotada, ya que habríamos retornado)
-        if (casilla.isAbierta()) {
-          casillasAbiertas++
-        }
-
-        // Contar minas correctamente marcadas
-        // Una casilla puede estar marcada y ser una mina, independientemente de si está abierta o
-        // no.
-        // Sin embargo, si estaba abierta y era mina, ya se retornó false.
-        // Así que aquí solo cuentan las minas marcadas que no están (fatalmente) abiertas.
-        if (casilla.isMarcada() && casilla.isMina()) {
-          minasMarcadasCorrectamente++
-        }
-      }
-    }
-
-    // Si se completa el bucle, no se ha abierto ninguna mina.
-    // Ahora se verifican las condiciones de victoria.
-
-    // Condición de victoria 1: Todas las minas están correctamente marcadas.
-    if (minasMarcadasCorrectamente == numeroMinas) {
-      return false // La partida no debe continuar (0 en C++)
-    }
-
-    // Condición de victoria 2: Todas las casillas seguras están abiertas.
-    val totalCasillasSeguras = (filas * columnas) - numeroMinas
-    if (casillasAbiertas == totalCasillasSeguras) {
-      return false // La partida no debe continuar (0 en C++)
-    }
-
-    return true // La partida debe continuar (1 en C++)
-  }*/
 
   fun verificarResultado(): Int {
     var casillasAbiertas = 0

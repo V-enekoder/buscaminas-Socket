@@ -193,6 +193,7 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
         return@setOnClickListener
       }
 
+
       // 3. Construye el mensaje con la jugada
       val action =
           when (actionSpinner.selectedItemPosition) {
@@ -201,6 +202,8 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
             2 -> "UNFLAG"
             else -> ""
           }
+
+      realizarJugada(action,rowStr.toInt(),colStr.toInt(),turnoActual)
       val miTurno = cliente?.getTurno() ?: -1 // Obtenemos el turno del cliente
       val puntuacion: Int = tableroLogico.getJugador().puntuacion
       val casillas: Int = tableroLogico.getJugador().casillasAbiertas
@@ -208,7 +211,7 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
 
       val mensajeMovimiento = "MOVE $miTurno $action ${rowStr}_${colStr} $puntuacion $turnoActual $casillas $banderas"
 
-      realizarJugada(action,rowStr.toInt(),colStr.toInt(),turnoActual)
+
       // 4. Envía la jugada al servidor (que la reenviará a todos)
       Thread { cliente?.enviarMensaje(mensajeMovimiento) }.start()
     }
