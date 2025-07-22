@@ -6,14 +6,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.R
 import com.example.myapplication.Server
-import com.example.myapplication.network.sockets.ClientHandler
 import com.example.myapplication.network.sockets.Cliente
 import com.example.myapplication.network.sockets.Direccion
 import kotlin.concurrent.thread
 import android.widget.Button
 import android.widget.EditText
 
-class ServerActivity : AppCompatActivity(), ClientHandler.ClienteConectadoListener {
+class ServerActivity : AppCompatActivity(), Server.ClienteConectadoListener {
 
   private val direccion = Direccion()
   private val server = Server(this)
