@@ -25,24 +25,4 @@ class Server(private val listener: ClientHandler.ClienteConectadoListener) : Run
       e.printStackTrace()
     }
   }
-
-  fun cerrarServidor() {
-    try {
-      serverSocket?.close()
-    } catch (e: Exception) {
-      e.printStackTrace()
-    }
-  }
-
-  fun descifrarMensaje(msj: String) {
-    var type: String = msj.split(" ")[0]
-
-    when (type) {
-      "GAME_START" -> {}
-    }
-  }
-
-  fun getPort(): Int {
-    return port
-  }
 }

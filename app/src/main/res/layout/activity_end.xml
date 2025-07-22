@@ -7,7 +7,6 @@
     android:padding="16dp"
     tools:context=".ui.activities.EndActivity">
 
-    <!-- Título principal del resultado (Ganaste/Perdiste) -->
     <TextView
         android:id="@+id/tituloResultadoTextView"
         android:layout_width="wrap_content"
@@ -20,7 +19,6 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="¡Ganaste!" />
 
-    <!-- Mensaje detallado sobre cómo terminó el juego -->
     <TextView
         android:id="@+id/mensajeDetalladoTextView"
         android:layout_width="0dp"
@@ -33,7 +31,6 @@
         app:layout_constraintTop_toBottomOf="@id/tituloResultadoTextView"
         tools:text="El oponente explotó una mina" />
 
-    <!-- Tabla para mostrar las estadísticas del juego -->
     <TableLayout
         android:id="@+id/statsTableLayout"
         android:layout_width="0dp"
@@ -44,7 +41,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mensajeDetalladoTextView">
 
-        <!-- Fila de Cabeceras -->
         <TableRow>
             <TextView
                 android:layout_width="wrap_content"
@@ -70,7 +66,6 @@
                 android:textStyle="bold" />
         </TableRow>
 
-        <!-- Fila con TUS datos -->
         <TableRow>
             <TextView
                 android:id="@+id/miNombreTextView"
@@ -96,7 +91,6 @@
                 tools:text="5" />
         </TableRow>
 
-        <!-- Fila con los datos del OPONENTE -->
         <TableRow>
             <TextView
                 android:id="@+id/NombreOponenteTextView"

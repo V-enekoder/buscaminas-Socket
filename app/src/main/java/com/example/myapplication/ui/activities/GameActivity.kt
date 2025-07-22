@@ -38,7 +38,7 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
   private lateinit var columnEditText: EditText
   private lateinit var sendMoveButton: Button
 
-  private lateinit var tableroLogico: Tablero
+  private lateinit var tablero: Tablero
 
   private lateinit var cellViews: Array<Array<TextView>>
 
@@ -61,9 +61,6 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
 
     recuperarConfiguracion()
     if (gameConfig == null) {
-      Toast.makeText(
-              this, "Error: No se pudo cargar la configuración del juego.", Toast.LENGTH_LONG)
-          .show()
       finish()
       return
     }
@@ -84,8 +81,27 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
     }
 
     runOnUiThread { cliente?.setMoveListener(this) }
-    inicializarVistas()
-    iniciarNuevoJuego()
+
+    matrixGridLayout = findViewById(R.id.matrixGridLayout)
+    actionSpinner = findViewById(R.id.actionSpinner)
+    rowEditText = findViewById(R.id.rowEditText)
+    columnEditText = findViewById(R.id.columnEditText)
+    sendMoveButton = findViewById(R.id.sendMoveButton)
+
+    val config = gameConfig!!
+    
+    tablero =
+      Tablero(
+        config.filas,
+        config.columnas,
+        config.posicionesMinas!!,
+        cliente?.nombre ?: "Player",
+        miTurno)
+    juegoActivo = true
+
+    // 2. Crear la VISTA inicial
+    setupGameGrid() // Crea los TextViews
+    actualizarTablero()
     setupSpinner()
     setupButtonListener()
   }
@@ -94,43 +110,12 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
     gameConfig =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
           // Método moderno y seguro para Android 13 (API 33) y superior
-          intent.getSerializableExtra("GAME_CONFIG", ConfiguracionTablero::class.java)
+          intent.getSerializableExtra("CONFIG", ConfiguracionTablero::class.java)
         } else {
           // Método antiguo (obsoleto) para versiones anteriores
           @Suppress("DEPRECATION")
-          intent.getSerializableExtra("GAME_CONFIG") as? ConfiguracionTablero
+          intent.getSerializableExtra("CONFIG") as? ConfiguracionTablero
         }
-
-    // Log para depuración
-    if (gameConfig == null) {
-      Log.e("GameActivity", "¡ERROR! No se recibió la configuración del juego en el Intent.")
-    }
-  }
-
-  private fun inicializarVistas() {
-    matrixGridLayout = findViewById(R.id.matrixGridLayout)
-    actionSpinner = findViewById(R.id.actionSpinner)
-    rowEditText = findViewById(R.id.rowEditText)
-    columnEditText = findViewById(R.id.columnEditText)
-    sendMoveButton = findViewById(R.id.sendMoveButton)
-  }
-
-  private fun iniciarNuevoJuego() {
-    val config = gameConfig!!
-
-    // 1. Crear la instancia del MODELO
-    tableroLogico =
-        Tablero(
-            config.filas,
-            config.columnas,
-            config.posicionesMinas!!,
-            cliente?.nombre ?: "Player",
-            miTurno)
-    juegoActivo = true
-
-    // 2. Crear la VISTA inicial
-    setupGameGrid() // Crea los TextViews
-    actualizarVistaTablero() // Dibuja el estado inicial del tablero (todo oculto)
   }
 
   private fun setupGameGrid() {
@@ -175,7 +160,7 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
         }
   }
 
-  private fun setupButtonListener() { // Aqui se manda la jugada
+  private fun setupButtonListener() { // turno = 1
     sendMoveButton.setOnClickListener {
       if (!juegoActivo) {
         mostrarToast("El juego ha terminado.")
@@ -186,13 +171,12 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
       val colStr = columnEditText.text.toString()
 
       if (rowStr.isEmpty() || colStr.isEmpty()) {
-        mostrarToast("Coordenadas inválidas.")
         return@setOnClickListener
       }
 
-      val casillaCandidata: Casilla? = tableroLogico.getCasilla(rowStr.toInt(), colStr.toInt())
+      val casillaCandidata: Casilla? = tablero.getCasilla(rowStr.toInt(), colStr.toInt())
 
-      if (!casillaCandidata!!.isDisponible()) {
+      if (casillaCandidata!!.isAbierta()) {
         mostrarToast("Casilla No Disponible.")
         return@setOnClickListener
       }
@@ -201,21 +185,19 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
       // 3. Construye el mensaje con la jugada
       val action =
           when (actionSpinner.selectedItemPosition) {
-            0 -> "REVEAL" // Usaremos strings para que sea más legible
-            1 -> "FLAG"
-            2 -> "UNFLAG"
+            0 -> "ABRIR" // Usaremos strings para que sea más legible
+            1 -> "MARCAR"
+            2 -> "DESMARCAR"
             else -> ""
           }
 
-      realizarJugada(action,rowStr.toInt(),colStr.toInt(),turnoActual)
+      realizarJugada(action,rowStr.toInt(),colStr.toInt(),turnoActual)//turno = 2
       val miTurno = cliente?.getTurno() ?: -1 // Obtenemos el turno del cliente
-      val puntuacion: Int = tableroLogico.getJugador().puntuacion
-      val casillas: Int = tableroLogico.getJugador().casillasAbiertas
-      val banderas: Int = tableroLogico.getJugador().banderasCorrectas
-      val nombre: String = tableroLogico.getJugador().nombre
-
-      val mensajeMovimiento = "MOVE $miTurno $action ${rowStr}_${colStr} $puntuacion $turnoActual $casillas $banderas $nombre"
-
+      val puntuacion: Int = tablero.getJugador().puntuacion
+      val casillas: Int = tablero.getJugador().casillasAbiertas
+      val banderas: Int = tablero.getJugador().banderasCorrectas
+      val nombre: String = tablero.getJugador().nombre
+      val mensajeMovimiento = "JUGADA $miTurno $action ${rowStr}_${colStr} $puntuacion $miTurno $casillas $banderas $nombre"
 
       // 4. Envía la jugada al servidor (que la reenviará a todos)
       Thread { cliente?.enviarMensaje(mensajeMovimiento) }.start()
@@ -242,21 +224,16 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
       // --- Le dice al MODELO LOCAL qué hacer ---
       val resultadoJugada: Int =
           when (action) {
-            "REVEAL" -> tableroLogico.abrirCasilla(row, col, turno)
-            "FLAG" -> tableroLogico.marcarCasilla(row, col, turno)
-            "UNFLAG" ->
-                tableroLogico.desmarcarCasilla(
+            "ABRIR" -> tablero.abrirCasilla(row, col, turno)
+            "MARCAR" -> tablero.marcarCasilla(row, col, turno)
+            "DESMARCAR" ->
+                tablero.desmarcarCasilla(
                     row, col, turno) // No esta quitando la bandera
             else -> 0
           }
 
       // --- Pide a la VISTA que se actualice con los cambios del modelo local ---
-      actualizarVistaTablero()
-
-      if (resultadoJugada == -1) {
-        juegoActivo = false
-        revelarTableroCompleto()
-      }
+      actualizarTablero()
 
       if (turno != miTurno) {
         puntuacionOponente = puntuacion
@@ -264,17 +241,18 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
         nombreOponente = nombre
       }
 
+      if (resultadoJugada == -1) {
+        juegoActivo = false
+        revelarTableroCompleto()
+      }
+
       turnoActual = if (turno == 1) 2 else 1
-
-      // 2. Actualizamos el estado del botón basándonos en el nuevo turno.
       actualizarEstadoBoton()
-
-      // --- Comprueba el estado del juego después de la jugada ---
       verificarEstadoDelJuego(ultimoTurno)
     }
   }
 
-  fun realizarJugada(
+  private fun realizarJugada(
     action: String,
     row: Int,
     col: Int,
@@ -286,16 +264,16 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
       // --- Le dice al MODELO LOCAL qué hacer ---
       val resultadoJugada: Int =
         when (action) {
-          "REVEAL" -> tableroLogico.abrirCasilla(row, col, miTurno)
-          "FLAG" -> tableroLogico.marcarCasilla(row, col, miTurno)
-          "UNFLAG" ->
-            tableroLogico.desmarcarCasilla(
+          "ABRIR" -> tablero.abrirCasilla(row, col, miTurno)
+          "MARCAR" -> tablero.marcarCasilla(row, col, miTurno)
+          "DESMARCAR" ->
+            tablero.desmarcarCasilla(
               row, col, miTurno) // No esta quitando la bandera
           else -> 0
         }
 
       // --- Pide a la VISTA que se actualice con los cambios del modelo local ---
-      actualizarVistaTablero()
+      actualizarTablero()
 
       if (resultadoJugada == -1) {
         juegoActivo = false
@@ -329,25 +307,24 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
   }
 
   // --- VISTA: Función clave para sincronizar la UI con el estado del Modelo ---
-  private fun actualizarVistaTablero() {
+  private fun actualizarTablero() {
     val config = gameConfig!!
     for (r in 0 until config.filas) {
       for (c in 0 until config.columnas) {
-        val casillaLogica = tableroLogico.getCasilla(r, c)!!
+        val casillaLogica = tablero.getCasilla(r, c)!!
         val cellView = cellViews[r][c]
 
         cellView.text = "" // Limpiar texto anterior
         cellView.setBackgroundColor(Color.DKGRAY) // Color por defecto de casilla oculta
 
         if (casillaLogica.isMarcada()) {
-          cellView.text = "🚩" // Emoji de bandera
-          cellView.setBackgroundColor(Color.CYAN)
+          cellView.text = "B" // Emoji de bandera
+          cellView.setBackgroundColor(Color.GREEN)
         } else if (casillaLogica.isAbierta()) {
           // La casilla está abierta, mostrar su contenido
-          cellView.setBackgroundColor(Color.LTGRAY)
+          cellView.setBackgroundColor(Color.WHITE)
           if (casillaLogica.isMina()) {
-            // cellView.text = "M"
-            cellView.text = "💣" // Emoji de bomba
+            cellView.text = "M" // Emoji de bomba
             cellView.setBackgroundColor(Color.RED)
           } else if (casillaLogica.getMinasAlrededor() > 0) {
             cellView.text = casillaLogica.getMinasAlrededor().toString()
@@ -361,7 +338,7 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
   }
 
   private fun verificarEstadoDelJuego(ultimoTurno: Int) {
-    val resultado = tableroLogico.verificarResultado()
+    val resultado = tablero.verificarResultado()
 
     // El juego termina si el resultado es 0 (derrota), 1 (victoria por banderas) o 2 (victoria por
     // casillas)
@@ -369,10 +346,8 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
       juegoActivo = false
       sendMoveButton.isEnabled = false // Desactivar botón si lo tienes
 
-      val puntuacion: Int = tableroLogico.getJugador().puntuacion
-      val banderas: Int = tableroLogico.getJugador().banderasCorrectas
-
-      Toast.makeText(this, "¡Juego Terminado! Cargando resultados...", Toast.LENGTH_SHORT).show()
+      val puntuacion: Int = tablero.getJugador().puntuacion
+      val banderas: Int = tablero.getJugador().banderasCorrectas
 
       // --- INICIO DEL DELAY USANDO COROUTINES ---
       lifecycleScope.launch {
@@ -381,10 +356,10 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
         // Este código se ejecuta DESPUÉS de los 2 segundos
 
         // (El resto de tu código para preparar el Intent)
-        val puntuacion: Int = tableroLogico.getJugador().puntuacion
-        val banderas: Int = tableroLogico.getJugador().banderasCorrectas
+        val puntuacion: Int = tablero.getJugador().puntuacion
+        val banderas: Int = tablero.getJugador().banderasCorrectas
         val datosJuego: String =
-          tableroLogico.getJugador().nombre +
+          tablero.getJugador().nombre +
                   ";$puntuacion" +
                   ";$resultado" +
                   ";$puntuacionOponente" +
@@ -417,9 +392,9 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
     val config = gameConfig!!
     for (r in 0 until config.filas) {
       for (c in 0 until config.columnas) {
-        tableroLogico.getCasilla(r, c)?.abrir()
+        tablero.getCasilla(r, c)?.abrir()
       }
     }
-    actualizarVistaTablero() // Vuelve a dibujar el tablero con todo revelado
+    actualizarTablero() // Vuelve a dibujar el tablero con todo revelado
   }
 }

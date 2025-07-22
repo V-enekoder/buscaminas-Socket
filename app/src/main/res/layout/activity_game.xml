@@ -7,25 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".ui.activities.GameActivity">
 
-    <!-- El título se queda igual -->
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mi Matriz de Buscaminas"
         android:textSize="24sp"
         android:layout_marginTop="32dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!--
-        PASO 1: Envolver el GridLayout en un HorizontalScrollView.
-        Este será el contenedor principal del tablero.
-        - Le damos un ID para poder referenciarlo.
-        - `layout_width="0dp"` y `layout_height="0dp"` para que ocupe el espacio disponible.
-        - Lo restringimos entre el título y los controles de abajo.
-    -->
     <HorizontalScrollView
         android:id="@+id/horizontal_scroll"
         android:layout_width="0dp"
@@ -37,20 +28,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/rowEditText">
 
-        <!-- PASO 2: Dentro del HorizontalScrollView, ponemos un ScrollView -->
         <ScrollView
             android:id="@+id/vertical_scroll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <!--
-                PASO 3: Tu GridLayout va DENTRO de los ScrollViews.
-                - IMPORTANTE: `layout_width` y `layout_height` ahora deben ser `wrap_content`.
-                  Esto le dice al GridLayout que sea tan grande como su contenido lo necesite,
-                  permitiendo que los ScrollViews hagan su trabajo.
-                - Se eliminan las restricciones (constraints) del GridLayout, ya que
-                  ahora su posición es manejada por sus padres (los ScrollViews).
-            -->
             <androidx.gridlayout.widget.GridLayout
                 android:id="@+id/matrixGridLayout"
                 android:layout_width="wrap_content"
@@ -60,20 +42,13 @@
                 app:rowOrderPreserved="false"
                 app:useDefaultMargins="true"
                 tools:rowCount="20"
-                tools:columnCount="20"> <!-- Puedes poner números grandes para previsualizar el scroll -->
+                tools:columnCount="20">
 
             </androidx.gridlayout.widget.GridLayout>
 
         </ScrollView>
     </HorizontalScrollView>
 
-
-    <!--
-        PASO 4: Ajustar las restricciones de los controles de abajo.
-        - `rowEditText` ahora debe estar restringido al final del `horizontal_scroll`
-          en lugar del `matrixGridLayout`.
-        - Le damos una restricción al final del layout para que no se mueva.
-    -->
     <EditText
         android:id="@+id/rowEditText"
         android:layout_width="0dp"

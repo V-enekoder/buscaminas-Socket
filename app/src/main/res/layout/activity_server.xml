@@ -7,7 +7,6 @@
     android:padding="16dp"
     tools:context=".ui.activities.ServerActivity">
 
-    <!-- Título principal de la pantalla -->
     <TextView
         android:id="@+id/tvServerTitle"
         android:layout_width="wrap_content"
@@ -20,7 +19,6 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="32dp" />
 
-    <!-- Etiqueta para el campo de nombre -->
     <TextView
         android:id="@+id/tvNombreLabel"
         android:layout_width="wrap_content"
@@ -31,7 +29,6 @@
         app:layout_constraintBottom_toTopOf="@id/etNombreServidor"
         android:layout_marginBottom="4dp"/>
 
-    <!-- NUEVO: Campo de texto para que el usuario escriba su nombre -->
     <EditText
         android:id="@+id/etNombreServidor"
         android:layout_width="0dp"
@@ -47,7 +44,6 @@
         app:layout_constraintTop_toBottomOf="@id/tvServerTitle"
         tools:text="Servidor" />
 
-    <!-- Sección de información de la IP (sin cambios) -->
     <TextView
         android:id="@+id/tvIpLabel"
         android:layout_width="wrap_content"
@@ -72,7 +68,6 @@
         app:layout_constraintTop_toBottomOf="@+id/tvIpLabel"
         tools:text="192.168.1.100" />
 
-    <!-- NUEVO: Botón para configurar la partida -->
     <Button
         android:id="@+id/btnConfigurarPartida"
         android:layout_width="0dp"

@@ -68,7 +68,7 @@ class GameConfigurationActivity : AppCompatActivity() {
     val config: ConfiguracionTablero? =
         when (selectedId) {
           R.id.rbEasy -> ConfiguracionTablero(4, 4, 4, nombre = nombreServidor)
-          R.id.rbMedium -> ConfiguracionTablero(6, 6, 10, nombre = nombreServidor)
+          R.id.rbMedium -> ConfiguracionTablero(6, 6, 8, nombre = nombreServidor)
           R.id.rbHard -> ConfiguracionTablero(8, 8, 12, nombre = nombreServidor)
           R.id.rbCustom -> getCustomConfiguration()
           else -> null
@@ -80,7 +80,7 @@ class GameConfigurationActivity : AppCompatActivity() {
       val mensaje = config.toMessage(posicionesMinas)
       Toast.makeText(
               this,
-              "Iniciando partida para ${config.nombre}",
+              "Iniciando partida",
               Toast.LENGTH_LONG)
           .show()
       cliente?.setContext(this)
@@ -121,7 +121,7 @@ class GameConfigurationActivity : AppCompatActivity() {
 
     // El nuevo formato del mensaje es:
     // GAME_CONFIG filas_columnas_minas POSICIONES
-    return "GAME_CONFIG ${filas}_${columnas}_${minas}_${nombre} $posicionesStr"
+    return "CONFIG ${filas}_${columnas}_${minas}_${nombre} $posicionesStr"
   }
 
   private fun getCustomConfiguration(): ConfiguracionTablero? {

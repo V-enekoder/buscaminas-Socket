@@ -16,7 +16,6 @@ class Cliente(dir: String, private val turno: Int, var nombre: String) : Runnabl
   private var dis: BufferedReader? = null
   private var dos: PrintWriter? = null
   private var context: Context? = null
-  // private var moveListener: OnMoveReceivedListener? = null
   private var moveListener: GameEventsListener? = null
 
   override fun run() {
@@ -32,22 +31,34 @@ class Cliente(dir: String, private val turno: Int, var nombre: String) : Runnabl
     }
   }
 
+  fun recibirMensaje() {
+    try {
+      var mensajeRecibido: String
+      while (socket?.isConnected == true) {
+        mensajeRecibido = dis?.readLine().toString()
+        descifrarMensaje(mensajeRecibido)
+      }
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
+  }
+
   fun descifrarMensaje(msj: String) {
     val partes = msj.split(" ")
     val type = partes[0]
 
     when (type) {
-      "GAME_CONFIG" -> {
-        val config = interpretarConfiguracion(msj)
+      "CONFIG" -> {
+        val config = getconf(msj)
         if (config != null) {
           // Lanzar GameActivity con esa config
           val intent = Intent(context, GameActivity::class.java)
           intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-          intent.putExtra("GAME_CONFIG", config)
+          intent.putExtra("CONFIG", config)
           context?.startActivity(intent)
         }
       }
-      "MOVE" -> {
+      "JUGADA" -> {
         try {
           val turnoJugador = partes[1].toInt() // Turno del que jugó
           val action = partes[2] // "REVEAL", "FLAG", etc.
@@ -70,14 +81,10 @@ class Cliente(dir: String, private val turno: Int, var nombre: String) : Runnabl
     }
   }
 
-  fun setMoveListener(listener: GameEventsListener?) {
-    this.moveListener = listener
-  }
-
-  fun interpretarConfiguracion(msj: String): ConfiguracionTablero? {
+  fun getconf(msj: String): ConfiguracionTablero? {
     return try {
       // Mensaje esperado: "GAME_CONFIG F_C_M F1-C1_F2-C2_..."
-      val partes = msj.removePrefix("GAME_CONFIG ").split(" ")
+      val partes = msj.removePrefix("CONFIG ").split(" ")
 
       val configBasica = partes[0].split("_")
       val filas = configBasica[0].toInt()
@@ -87,10 +94,10 @@ class Cliente(dir: String, private val turno: Int, var nombre: String) : Runnabl
 
       val posicionesStr = partes[1] // "0-1_2-3_..."
       val listaPosiciones =
-          posicionesStr.split("_").map { pos ->
-            val coords = pos.split("-")
-            Pair(coords[0].toInt(), coords[1].toInt())
-          }
+        posicionesStr.split("_").map { pos ->
+          val coords = pos.split("-")
+          Pair(coords[0].toInt(), coords[1].toInt())
+        }
 
       // Creamos el objeto de configuración con la lista de minas
       ConfiguracionTablero(filas, columnas, minas, listaPosiciones, nombre)
@@ -100,21 +107,14 @@ class Cliente(dir: String, private val turno: Int, var nombre: String) : Runnabl
     }
   }
 
+  fun setMoveListener(listener: GameEventsListener?) {
+    this.moveListener = listener
+  }
+
+
   fun enviarMensaje(msj: String) {
     try {
       dos?.println(msj)
-    } catch (e: Exception) {
-      e.printStackTrace()
-    }
-  }
-
-  fun recibirMensaje() {
-    try {
-      var mensajeRecibido: String
-      while (socket?.isConnected == true) {
-        mensajeRecibido = dis?.readLine().toString()
-        descifrarMensaje(mensajeRecibido)
-      }
     } catch (e: Exception) {
       e.printStackTrace()
     }

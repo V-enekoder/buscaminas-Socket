@@ -7,20 +7,18 @@
     android:padding="16dp"
     tools:context=".ui.activities.ClientActivity">
 
-    <!-- Título de la pantalla -->
     <TextView
         android:id="@+id/tvClientTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Modo Cliente"
+        android:text="Cliente"
         android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Etiqueta para el nombre del jugador -->
     <TextView
         android:id="@+id/tvNombreLabel"
         android:layout_width="wrap_content"
@@ -31,7 +29,6 @@
         app:layout_constraintBottom_toTopOf="@id/etNombreCliente"
         android:layout_marginBottom="4dp"/>
 
-    <!-- NUEVO: Campo de texto para el nombre del cliente -->
     <EditText
         android:id="@+id/etNombreCliente"
         android:layout_width="0dp"
@@ -46,7 +43,6 @@
         app:layout_constraintTop_toBottomOf="@id/tvClientTitle"
         tools:text="Cliente" />
 
-    <!-- Etiqueta para la IP -->
     <TextView
         android:id="@+id/tvIpLabel"
         android:layout_width="wrap_content"
@@ -57,7 +53,6 @@
         app:layout_constraintBottom_toTopOf="@id/etIpAddress"
         android:layout_marginBottom="4dp"/>
 
-    <!-- Campo de texto para la dirección IP -->
     <EditText
         android:id="@+id/etIpAddress"
         android:layout_width="0dp"
@@ -74,7 +69,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etNombreCliente" />
 
-    <!-- Botón para conectar -->
     <Button
         android:id="@+id/btnConnect"
         android:layout_width="0dp"

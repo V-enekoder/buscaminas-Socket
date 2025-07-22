@@ -26,18 +26,12 @@ class MainActivity : AppCompatActivity() {
 
     // Listener para el botón de Servidor
     btnServer.setOnClickListener {
-      Toast.makeText(this, "Iniciando modo Servidor...", Toast.LENGTH_SHORT).show()
-
-      // Crea un Intent para ir a ServerActivity
       val intent = Intent(this, ServerActivity::class.java)
       startActivity(intent)
     }
 
     // Listener para el botón de Cliente
     btnClient.setOnClickListener {
-      Toast.makeText(this, "Iniciando modo Cliente...", Toast.LENGTH_SHORT).show()
-
-      // Crea un Intent para ir a ClientActivity
       val intent = Intent(this, ClientActivity::class.java)
       startActivity(intent)
     }

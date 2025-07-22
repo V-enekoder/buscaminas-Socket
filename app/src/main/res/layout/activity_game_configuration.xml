@@ -40,7 +40,7 @@
             android:id="@+id/rbMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Intermedio (6x6, 10 minas)"
+            android:text="Intermedio (6x6, 8 minas)"
             android:textSize="18sp" />
 
         <RadioButton
@@ -58,7 +58,6 @@
             android:textSize="18sp" />
     </RadioGroup>
 
-    <!-- Contenedor para la configuración personalizada (inicialmente oculto) -->
     <androidx.constraintlayout.widget.Group
         android:id="@+id/groupCustomConfig"
         android:layout_width="wrap_content"
