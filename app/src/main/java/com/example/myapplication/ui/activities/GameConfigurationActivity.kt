@@ -69,7 +69,6 @@ class GameConfigurationActivity : AppCompatActivity() {
         when (selectedId) {
           R.id.rbEasy -> ConfiguracionTablero(4, 4, 4, nombre = nombreServidor)
           R.id.rbMedium -> ConfiguracionTablero(6, 6, 8, nombre = nombreServidor)
-          R.id.rbHard -> ConfiguracionTablero(8, 8, 12, nombre = nombreServidor)
           R.id.rbCustom -> getCustomConfiguration()
           else -> null
         }

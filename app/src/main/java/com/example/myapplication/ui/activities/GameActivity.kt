@@ -322,7 +322,7 @@ class GameActivity : AppCompatActivity(), GameEventsListener {
           cellView.setBackgroundColor(Color.GREEN)
         } else if (casillaLogica.isAbierta()) {
           // La casilla está abierta, mostrar su contenido
-          cellView.setBackgroundColor(Color.WHITE)
+          cellView.setBackgroundColor(Color.LTGRAY)
           if (casillaLogica.isMina()) {
             cellView.text = "M" // Emoji de bomba
             cellView.setBackgroundColor(Color.RED)

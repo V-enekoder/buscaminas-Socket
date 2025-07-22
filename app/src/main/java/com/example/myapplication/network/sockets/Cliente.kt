@@ -60,19 +60,9 @@ class Cliente(dir: String, private val turno: Int, var nombre: String) : Runnabl
       }
       "JUGADA" -> {
         try {
-          val turnoJugador = partes[1].toInt() // Turno del que jugó
-          val action = partes[2] // "REVEAL", "FLAG", etc.
           val coords = partes[3].split("_")
-          val row = coords[0].toInt()
-          val col = coords[1].toInt()
-          val puntuacion: Int = partes[4].toInt()
-          val ultimoTurno: Int = partes[5].toInt()
-          val casillas: Int = partes[6].toInt()
-          val banderas: Int = partes[7].toInt()
-          val nombre: String = partes[8]
-
-          // Notifica a GameActivity, ¡ahora con el turno!
-          moveListener?.onMoveReceived(turnoJugador, action, row, col, puntuacion, ultimoTurno, casillas, banderas,nombre)
+          moveListener?.onMoveReceived(partes[1].toInt(),partes[2], coords[0].toInt(), coords[1].toInt(),
+            partes[4].toInt(), partes[5].toInt(), partes[6].toInt(), partes[7].toInt(),partes[8])
         } catch (e: Exception) {
           println("Error al interpretar mensaje MOVE: $msj")
           e.printStackTrace()

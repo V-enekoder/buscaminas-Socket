@@ -12,7 +12,7 @@
         android:id="@+id/tvConfigTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Selecciona la Dificultad"
+        android:text="Tipo de Partida"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -41,13 +41,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Intermedio (6x6, 8 minas)"
-            android:textSize="18sp" />
-
-        <RadioButton
-            android:id="@+id/rbHard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Difícil (8x8, 12 minas)"
             android:textSize="18sp" />
 
         <RadioButton
